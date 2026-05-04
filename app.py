@@ -27,6 +27,10 @@ def index():
 @app.route("/verify", methods=["POST"])
 def verify():
     name = request.form.get("name", "").strip()
+    print(f"[verify] submitted: '{name}' | total names loaded: {len(VALID_NAMES)}")
+    # Show closest names to help debug
+    close = [n for n in VALID_NAMES if name.lower() in n.lower() or n.lower() in name.lower()]
+    print(f"[verify] partial matches: {close[:5]}")
     if name not in VALID_NAMES:
         return render_template("index.html", error="Name not recognised. Check spelling and capitalisation exactly as it appears in the community.")
     pdf_bytes = generate_pdf(name)
