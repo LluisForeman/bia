@@ -8,18 +8,19 @@ app = Flask(__name__)
 VALID_NAMES: set = set()
 
 # --- Document registry ---
-# Add your files here: "url-slug": ("written/filename.pdf", "Display Title")
+# "url-slug": ("written/filename.pdf", "Display Title")
 DOCUMENTS = {
-    "dlr":         ("written/DLR.pdf",     "DLR"),
-    "spacex":      ("written/SpaceX.pdf",  "SpaceX"),
-    "esa":         ("written/ESA.pdf",     "ESA"),
-    "nasa":        ("written/NASA.pdf",    "NASA"),
-    "airbus":      ("written/Airbus.pdf",  "Airbus"),
-    "boeing":      ("written/Boeing.pdf",  "Boeing"),
-    "lockheed":    ("written/Lockheed.pdf","Lockheed Martin"),
-    "northrop":    ("written/Northrop.pdf","Northrop Grumman"),
-    "raytheon":    ("written/Raytheon.pdf","Raytheon"),
-    "blueorigin":  ("written/BlueOrigin.pdf", "Blue Origin"),
+    "airbus":        ("written/airbus_interview_prep.pdf",          "Airbus"),
+    "blueorigin":    ("written/blue_origin_interview_prep.pdf",     "Blue Origin"),
+    "boeing":        ("written/boeing_interview_prep.pdf",          "Boeing"),
+    "dlr":           ("written/dlr_interview_prep.pdf",             "DLR"),
+    "embraer":       ("written/embraer_interview_prep.pdf",         "Embraer"),
+    "esa":           ("written/esa_interview_prep.pdf",             "ESA"),
+    "lockheed":      ("written/lockheed_martin_interview_prep.pdf", "Lockheed Martin"),
+    "nasa":          ("written/nasa_interview_prep.pdf",            "NASA"),
+    "northrop":      ("written/northrop_grumman_interview_prep.pdf","Northrop Grumman"),
+    "rollsroyce":    ("written/rolls_royce_interview_prep.pdf",     "Rolls-Royce"),
+    "spacex":        ("written/spacex_interview_prep.pdf",          "SpaceX"),
 }
 
 def refresh_names():
