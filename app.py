@@ -22,17 +22,21 @@ atexit.register(lambda: scheduler.shutdown())
 
 @app.route("/")
 def index():
-    return render_template("index.html", error=None)
+    return render_template("index.html", error=None, warming=False)
 
 @app.route("/verify", methods=["POST"])
 def verify():
     name = request.form.get("name", "").strip()
     print(f"[verify] submitted: '{name}' | total names loaded: {len(VALID_NAMES)}")
-    # Show closest names to help debug
+
+    if not VALID_NAMES:
+        return render_template("index.html", warming=True, error=None)
+
     close = [n for n in VALID_NAMES if name.lower() in n.lower() or n.lower() in name.lower()]
     print(f"[verify] partial matches: {close[:5]}")
+
     if name not in VALID_NAMES:
-        return render_template("index.html", error="Name not recognised. Check spelling and capitalisation exactly as it appears in the community.")
+        return render_template("index.html", error="Name not recognised. Check spelling and capitalisation exactly as it appears in the community.", warming=False)
     pdf_bytes = generate_pdf(name)
     filename = f"document_{name.replace(' ', '_')}.pdf"
     return Response(
