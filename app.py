@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, Response
 from apscheduler.schedulers.background import BackgroundScheduler
 from scraper import scrape_all_pages
 from pdf_gen import generate_pdf
+import threading
 import atexit
 
 app = Flask(__name__)
@@ -11,7 +12,8 @@ def refresh_names():
     global VALID_NAMES
     VALID_NAMES = scrape_all_pages()
 
-refresh_names()
+# Run initial scrape in background so gunicorn can bind to port immediately
+threading.Thread(target=refresh_names, daemon=True).start()
 
 scheduler = BackgroundScheduler()
 scheduler.add_job(refresh_names, "interval", hours=1)
