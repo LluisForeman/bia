@@ -19,7 +19,7 @@ def _make_name_stamp(name: str, width_pt: float, height_pt: float) -> bytes:
     x = w_mm - 10
     y = h_mm / 2
 
-    stamp_text = f"{name} - sharing is not allowed and will be prosecuted"
+    stamp_text = f"Document generated for {name}. Distribution of this document without explicit authorization is not allowed and will be prosecuted legally by the emitting entity."
     text_w = pdf.get_string_width(stamp_text) + 6
 
     with pdf.rotation(angle=90, x=x, y=y):
