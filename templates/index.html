@@ -119,7 +119,7 @@
 <body>
   <div class="card">
     <div class="logo">Break Into Aerospace</div>
-    <h1>Download your document</h1>
+    <h1>Download your {{ title }} document</h1>
     <p>Enter your name exactly as it appears in the community — including capitalisation.</p>
 
     {% if warming %}
@@ -133,7 +133,7 @@
     <div class="error">{{ error }}</div>
     {% endif %}
 
-    <form method="POST" action="/verify">
+    <form method="POST" action="/{{ slug }}/verify">
       <label for="name">Full name</label>
       <input type="text" id="name" name="name" placeholder="e.g. Emmanuel Victor" autocomplete="off" required>
       <button type="submit">Verify &amp; Download</button>
