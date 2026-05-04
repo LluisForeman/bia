@@ -78,6 +78,30 @@
       transition: background 0.15s;
     }
     button:hover { background: #3a5ce6; }
+    button:disabled {
+      background: #b0bcf5;
+      cursor: not-allowed;
+    }
+    .checkbox-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+    .checkbox-row input[type="checkbox"] {
+      margin-top: 2px;
+      width: 15px;
+      height: 15px;
+      flex-shrink: 0;
+      cursor: pointer;
+      accent-color: #4a6cf7;
+    }
+    .checkbox-label {
+      font-size: 13px;
+      color: #444;
+      line-height: 1.4;
+      cursor: pointer;
+    }
     .error {
       background: #fff5f5;
       border: 1px solid #f5c6c6;
@@ -137,7 +161,13 @@
     <form method="POST" action="/{{ slug }}/verify">
       <label for="name">Full name</label>
       <input type="text" id="name" name="name" placeholder="e.g. Lluís Foreman" autocomplete="off" required>
-      <button type="submit">Verify &amp; Download</button>
+
+      <div class="checkbox-row">
+        <input type="checkbox" id="confirm" name="confirm" required onchange="document.getElementById('submit-btn').disabled = !this.checked;">
+        <label for="confirm" class="checkbox-label">I hereby confirm that this is my name and I am a member of this community</label>
+      </div>
+
+      <button type="submit" id="submit-btn" disabled>Verify &amp; Download</button>
     </form>
     {% else %}
     <div class="error" style="background:#f0f4ff;border-color:#c0ccf7;color:#3a5ce6;">
