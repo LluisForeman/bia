@@ -3,4 +3,5 @@ apscheduler
 requests
 beautifulsoup4
 fpdf2
+pypdf
 gunicorn

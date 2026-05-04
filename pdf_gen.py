@@ -1,57 +1,58 @@
+import io
 from fpdf import FPDF
+from pypdf import PdfReader, PdfWriter
 
-def generate_pdf(name: str) -> bytes:
-    pdf = FPDF()
+SOURCE_PDF = "written/DLR.pdf"
+
+
+def _make_name_stamp(name: str, width_pt: float, height_pt: float) -> bytes:
+    """
+    Create a single-page PDF (same size as the source page) containing only
+    the member's name printed vertically on the right side.
+    """
+    # fpdf2 works in mm; convert from PDF points (1 pt = 25.4/72 mm)
+    w_mm = width_pt * 25.4 / 72
+    h_mm = height_pt * 25.4 / 72
+
+    pdf = FPDF(unit="mm", format=(w_mm, h_mm))
     pdf.add_page()
+    pdf.set_font("Helvetica", "B", 10)
+    pdf.set_text_color(180, 50, 50)   # subtle red — visible but not intrusive
 
-    pdf.set_fill_color(60, 80, 180)
-    pdf.rect(0, 0, 210, 20, 'F')
-    pdf.set_text_color(255, 255, 255)
-    pdf.set_font("Helvetica", "B", 13)
-    pdf.set_y(6)
-    pdf.cell(0, 8, "BREAK INTO AEROSPACE", align="C")
+    # Right edge: 10 mm from right, vertically centred
+    x = w_mm - 10
+    y = h_mm / 2
 
-    pdf.set_text_color(30, 30, 60)
-    pdf.set_font("Helvetica", "B", 18)
-    pdf.set_y(35)
-    pdf.cell(0, 10, "Member Resource Document", align="C", ln=True)
+    text_w = pdf.get_string_width(name) + 6
 
-    pdf.set_draw_color(180, 190, 220)
-    pdf.set_line_width(0.3)
-    pdf.line(20, 50, 190, 50)
-
-    pdf.set_font("Helvetica", "", 11)
-    pdf.set_text_color(80, 80, 100)
-    pdf.set_y(60)
-    body = [
-        "This document has been generated exclusively for the member identified below.",
-        "It contains proprietary content belonging to the Break Into Aerospace community.",
-        "",
-        "Please read all sections carefully. This material is intended solely for your",
-        "personal use as a registered member. Sharing, reproducing, or distributing",
-        "this document in any form without prior written authorization from the issuing",
-        "entity is strictly prohibited and may result in legal action.",
-    ]
-    for line in body:
-        pdf.cell(0, 7, line, align="C", ln=True)
-
-    pdf.set_fill_color(240, 243, 255)
-    pdf.set_draw_color(60, 80, 180)
-    pdf.set_line_width(0.4)
-    pdf.rect(20, 240, 170, 32, 'FD')
-
-    pdf.set_font("Helvetica", "B", 9)
-    pdf.set_text_color(60, 80, 180)
-    pdf.set_xy(25, 245)
-    pdf.cell(0, 5, "DOCUMENT SIGNATURE", ln=True)
-
-    pdf.set_font("Helvetica", "", 9)
-    pdf.set_text_color(40, 40, 80)
-    pdf.set_x(25)
-    pdf.cell(0, 5, f"Document generated for {name}.", ln=True)
-    pdf.set_x(25)
-    pdf.cell(0, 5, "Distribution of this document without explicit authorization can and will be", ln=True)
-    pdf.set_x(25)
-    pdf.cell(0, 5, "prosecuted legally by the emitting entity.", ln=True)
+    # Rotate 90° so text reads bottom-to-top along the right margin
+    with pdf.rotation(angle=90, x=x, y=y):
+        pdf.set_xy(x - text_w / 2, y - 3)
+        pdf.cell(text_w, 6, name, align="C")
 
     return bytes(pdf.output())
+
+
+def generate_pdf(name: str) -> bytes:
+    """
+    Read source.pdf, stamp the member's name vertically on the right side
+    of every page, and return the resulting PDF as bytes.
+    """
+    reader = PdfReader(SOURCE_PDF)
+    writer = PdfWriter()
+
+    for page in reader.pages:
+        width_pt  = float(page.mediabox.width)
+        height_pt = float(page.mediabox.height)
+
+        # Build a stamp page the same size as this page
+        stamp_bytes = _make_name_stamp(name, width_pt, height_pt)
+        stamp_page  = PdfReader(io.BytesIO(stamp_bytes)).pages[0]
+
+        # Overlay the stamp on top of the original page
+        page.merge_page(stamp_page)
+        writer.add_page(page)
+
+    output = io.BytesIO()
+    writer.write(output)
+    return output.getvalue()
