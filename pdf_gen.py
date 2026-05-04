@@ -15,21 +15,24 @@ def _make_name_stamp(name: str, width_pt: float, height_pt: float) -> bytes:
 
     pdf = FPDF(unit="mm", format=(w_mm, h_mm))
     pdf.add_page()
-    pdf.set_font("Helvetica", "B", 10)
-    pdf.set_text_color(0, 0, 0)  # black
 
-    x = w_mm - 10
-    y = h_mm / 2
+
+
+    pdf.set_font("Helvetica", "", 8)
+    pdf.set_text_color(0, 0, 0)
 
     now_cet = datetime.now(ZoneInfo("Europe/Berlin")).strftime("%Y-%m-%d %H:%M CET")
-    stamp_text = (f"Document generated for {name} on {now_cet}. "
-                  f"Distribution of this document without explicit authorization "
-                  f"is not allowed and will be prosecuted legally by the emitting entity.")
-    text_w = pdf.get_string_width(stamp_text) + 6
+    line1 = f"Document generated for {name} on {now_cet}."
+    line2 = ("Distribution of this document without explicit authorization "
+             "is not allowed and will be prosecuted legally by the emitting entity.")
 
-    with pdf.rotation(angle=90, x=x, y=y):
-        pdf.set_xy(x - text_w / 2, y - 3)
-        pdf.cell(text_w, 6, stamp_text, align="C")
+    y = h_mm / 2
+    # Two vertical strips side by side — rightmost first
+    for x_pos, text in [(w_mm - 7, line1), (w_mm - 13, line2)]:
+        text_w = pdf.get_string_width(text) + 6
+        with pdf.rotation(angle=90, x=x_pos, y=y):
+            pdf.set_xy(x_pos - text_w / 2, y - 3)
+            pdf.cell(text_w, 6, text, align="C")
 
     return bytes(pdf.output())
 
