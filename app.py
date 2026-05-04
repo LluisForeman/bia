@@ -37,7 +37,8 @@ atexit.register(lambda: scheduler.shutdown())
 
 @app.route("/")
 def index():
-    return "Break Into Aerospace — use a document link to access your file.", 200
+    return render_template("index.html", error=None, warming=False,
+                           slug=None, title="your")
 
 
 @app.route("/<slug>")

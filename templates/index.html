@@ -133,11 +133,17 @@
     <div class="error">{{ error }}</div>
     {% endif %}
 
+    {% if slug %}
     <form method="POST" action="/{{ slug }}/verify">
       <label for="name">Full name</label>
       <input type="text" id="name" name="name" placeholder="e.g. Emmanuel Victor" autocomplete="off" required>
       <button type="submit">Verify &amp; Download</button>
     </form>
+    {% else %}
+    <div class="error" style="background:#f0f4ff;border-color:#c0ccf7;color:#3a5ce6;">
+      Please use the specific document link you were given to access your file.
+    </div>
+    {% endif %}
     <p class="hint">Your name must match the community member list exactly.</p>
   </div>
 </body>
