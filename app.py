@@ -41,5 +41,10 @@ def verify():
 def health():
     return "ok", 200
 
+@app.route("/debug")
+def debug():
+    sample = sorted(list(VALID_NAMES))[:10]
+    return {"count": len(VALID_NAMES), "sample": sample}, 200
+
 if __name__ == "__main__":
     app.run(debug=True)
