@@ -11,16 +11,23 @@ VALID_NAMES: set = set()
 # "url-slug": ("written/filename.pdf", "Display Title")
 DOCUMENTS = {
     "airbus":        ("written/airbus_interview_prep.pdf",          "Airbus"),
+    "bae":           ("written/bae_interview_prep.pdf",             "BAE Systems"),
     "blueorigin":    ("written/blue_origin_interview_prep.pdf",     "Blue Origin"),
     "boeing":        ("written/boeing_interview_prep.pdf",          "Boeing"),
     "dlr":           ("written/dlr_interview_prep.pdf",             "DLR"),
     "embraer":       ("written/embraer_interview_prep.pdf",         "Embraer"),
     "esa":           ("written/esa_interview_prep.pdf",             "ESA"),
+    "hanwha":        ("written/hanwha_interview_prep.pdf",          "Hanwha"),
+    "khi":           ("written/khi_interview_prep.pdf",             "Kawasaki Heavy Industries"),
+    "kongsberg":     ("written/kongsberg_interview_prep.pdf",       "Kongsberg"),
+    "leonardo":      ("written/leonardo_interview_prep.pdf",        "Leonardo"),
     "lockheed":      ("written/lockheed_martin_interview_prep.pdf", "Lockheed Martin"),
     "nasa":          ("written/nasa_interview_prep.pdf",            "NASA"),
     "northrop":      ("written/northrop_grumman_interview_prep.pdf","Northrop Grumman"),
+    "rocketlab":     ("written/rocketlab_interview_prep.pdf",       "Rocket Lab"),
     "rollsroyce":    ("written/rolls_royce_interview_prep.pdf",     "Rolls-Royce"),
     "spacex":        ("written/spacex_interview_prep.pdf",          "SpaceX"),
+    "uksa":          ("written/uksa_interview_prep.pdf",            "UK Space Agency"),
 }
 
 def refresh_names():
