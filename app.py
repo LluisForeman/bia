@@ -1,10 +1,16 @@
-from flask import Flask, render_template, request, Response, abort
+from flask import Flask, render_template, request, Response, abort, redirect, url_for
 from apscheduler.schedulers.background import BackgroundScheduler
+from itsdangerous import URLSafeSerializer
 from scraper import scrape_all_pages
-from pdf_gen import generate_pdf
-import atexit
+from pdf_gen import generate_pdf, generate_certificate
+import hashlib, os, atexit
+from datetime import datetime
+from zoneinfo import ZoneInfo
 
 app = Flask(__name__)
+app.secret_key = os.environ.get("SECRET_KEY", "bia-secret-key-change-in-prod")
+_signer = URLSafeSerializer(app.secret_key, salt="cert")
+
 VALID_NAMES: set = set()
 
 # --- Document registry ---
@@ -30,6 +36,26 @@ DOCUMENTS = {
     "uksa":          ("written/uksa_interview_prep.pdf",            "UK Space Agency"),
 }
 
+# --- Certificate registry ---
+# "cert-slug": "Course Title"
+CERTIFICATES = {
+    "aircraft-intro":        "Aerospace Engineering: Aircraft Introduction",
+    "aircraft-fundamentals": "Aerospace Engineering: Aircraft Fundamentals",
+    "aircraft-systems":      "Aerospace Engineering: Aircraft Systems and Avionics",
+    "aircraft-structures":   "Aerospace Engineering: Aircraft Structures and Materials",
+    "airlines-airports":     "Aerospace Engineering: Airlines, Aircraft and Airports",
+    "aircraft-avionics":     "Aerospace Engineering: Aircraft Avionics and Cockpit",
+    "aircraft-aerodynamics": "Aerospace Engineering: Aircraft Aerodynamics",
+    "aircraft-design":       "Aerospace Engineering: Aircraft Optimal Design and Performance",
+    "aircraft-jet-engines":  "Aerospace Engineering: Aircraft Jet Engines",
+    "airlines-management":   "Airlines Management: Operations and Business Models",
+    "aircraft-electrical":   "Aerospace Engineering: Aircraft Electrical Systems",
+    "10-aircraft":           "Aerospace Engineering: 10 Aircraft Explained",
+    "astronautics":          "Astronautics and SpaceTech for Future Human Missions",
+    "spacecraft-engineering":"Interplanetary Spacecraft and Satellite Engineering",
+    "rocket-fundamentals":   "Aerospace Engineering: Rocket Fundamentals",
+}
+
 def refresh_names():
     global VALID_NAMES
     VALID_NAMES = scrape_all_pages()
@@ -42,6 +68,8 @@ scheduler.add_job(refresh_names, "interval", hours=1)
 scheduler.start()
 atexit.register(lambda: scheduler.shutdown())
 
+
+# ── Interview doc routes ──────────────────────────────────────────────────────
 
 @app.route("/")
 def index():
@@ -82,6 +110,73 @@ def verify(slug):
         headers={"Content-Disposition": f"attachment; filename={filename}"}
     )
 
+
+# ── Certificate routes ────────────────────────────────────────────────────────
+
+@app.route("/cert/<course_slug>")
+def cert_page(course_slug):
+    if course_slug not in CERTIFICATES:
+        abort(404)
+    course_title = CERTIFICATES[course_slug]
+    return render_template("cert.html", error=None, warming=False,
+                           course_slug=course_slug, course_title=course_title)
+
+
+@app.route("/cert/<course_slug>/verify", methods=["POST"])
+def cert_verify(course_slug):
+    if course_slug not in CERTIFICATES:
+        abort(404)
+
+    course_title = CERTIFICATES[course_slug]
+    name = request.form.get("name", "").strip()
+    print(f"[cert] course={course_slug} submitted='{name}' loaded={len(VALID_NAMES)}")
+
+    if not VALID_NAMES:
+        return render_template("cert.html", warming=True, error=None,
+                               course_slug=course_slug, course_title=course_title)
+
+    if name not in VALID_NAMES:
+        return render_template("cert.html",
+                               error="Name not recognised. Check spelling and capitalisation exactly as it appears in the community.",
+                               warming=False, course_slug=course_slug, course_title=course_title)
+
+    # Generate deterministic cert ID from name + course
+    raw = f"{app.secret_key}:{name}:{course_slug}"
+    cert_id = "cert_" + hashlib.sha256(raw.encode()).hexdigest()[:8]
+
+    # Issue date in CET
+    issued = datetime.now(ZoneInfo("Europe/Berlin")).strftime("%A, %B %-d, %Y")
+
+    # Sign a token encoding all the data needed to regenerate the PDF
+    token = _signer.dumps({"name": name, "course": course_slug, "cert_id": cert_id, "issued": issued})
+
+    return redirect(url_for("cert_view", course_slug=course_slug, token=token))
+
+
+@app.route("/cert/<course_slug>/view/<token>")
+def cert_view(course_slug, token):
+    if course_slug not in CERTIFICATES:
+        abort(404)
+    try:
+        data = _signer.loads(token)
+    except Exception:
+        abort(400)
+
+    name        = data["name"]
+    cert_id     = data["cert_id"]
+    issued      = data["issued"]
+    course_title = CERTIFICATES[course_slug]
+
+    pdf_bytes = generate_certificate(name, course_title, cert_id, issued)
+    filename = f"certificate_{name.replace(' ', '_')}.pdf"
+    return Response(
+        pdf_bytes,
+        mimetype="application/pdf",
+        headers={"Content-Disposition": f"inline; filename={filename}"}
+    )
+
+
+# ── Utility routes ────────────────────────────────────────────────────────────
 
 @app.route("/health")
 def health():

@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ValueKnow — Course Certificate</title>
+  {% if warming %}<script>setTimeout(function(){ window.location.href = '/cert/{{ course_slug }}'; }, 6000);</script>{% endif %}
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #f4f6f9;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .card {
+      background: white;
+      border-radius: 16px;
+      padding: 40px;
+      max-width: 460px;
+      width: 100%;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+    }
+    .logo {
+      font-size: 13px;
+      font-weight: 600;
+      color: #b8860b;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+    .course-badge {
+      display: inline-block;
+      background: #fdf3d0;
+      color: #7a5a00;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 20px;
+      margin-bottom: 20px;
+    }
+    h1 {
+      font-size: 22px;
+      font-weight: 600;
+      color: #1a1a2e;
+      margin-bottom: 10px;
+    }
+    p {
+      font-size: 14px;
+      color: #666;
+      line-height: 1.6;
+      margin-bottom: 24px;
+    }
+    label {
+      font-size: 13px;
+      font-weight: 500;
+      color: #1a1a2e;
+      display: block;
+      margin-bottom: 8px;
+    }
+    input[type="text"] {
+      width: 100%;
+      border: 1.5px solid #dde1ea;
+      border-radius: 8px;
+      padding: 12px 14px;
+      font-size: 14px;
+      font-family: inherit;
+      color: #1a1a2e;
+      outline: none;
+      transition: border-color 0.15s;
+      margin-bottom: 16px;
+    }
+    input[type="text"]:focus { border-color: #b8860b; }
+    button {
+      width: 100%;
+      padding: 13px;
+      background: #b8860b;
+      color: white;
+      font-size: 15px;
+      font-weight: 600;
+      font-family: inherit;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    button:hover { background: #9a7009; }
+    button:disabled {
+      background: #d4b96a;
+      cursor: not-allowed;
+    }
+    .checkbox-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+    .checkbox-row input[type="checkbox"] {
+      margin-top: 2px;
+      width: 15px;
+      height: 15px;
+      flex-shrink: 0;
+      cursor: pointer;
+      accent-color: #b8860b;
+    }
+    .checkbox-label {
+      font-size: 13px;
+      color: #444;
+      line-height: 1.4;
+      cursor: pointer;
+    }
+    .error {
+      background: #fff5f5;
+      border: 1px solid #f5c6c6;
+      color: #c0392b;
+      font-size: 13px;
+      padding: 12px 14px;
+      border-radius: 8px;
+      margin-bottom: 16px;
+    }
+    .warming {
+      background: #fffbea;
+      border: 1px solid #f6d860;
+      color: #856404;
+      font-size: 13px;
+      padding: 12px 14px;
+      border-radius: 8px;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .spinner {
+      width: 14px; height: 14px;
+      border: 2px solid #f6d860;
+      border-top-color: #856404;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      flex-shrink: 0;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .hint {
+      font-size: 12px;
+      color: #aaa;
+      text-align: center;
+      margin-top: 16px;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="logo">ValueKnow</div>
+    <span class="course-badge">{{ course_title }}</span>
+    <h1>Get your Certificate</h1>
+    <p>Enter your name exactly as it appears in the community — including capitalisation. Your certificate will open as a shareable link.</p>
+
+    {% if warming %}
+    <div class="warming">
+      <div class="spinner"></div>
+      Service is warming up — refreshing automatically…
+    </div>
+    {% endif %}
+
+    {% if error %}
+    <div class="error">{{ error }}</div>
+    {% endif %}
+
+    <form method="POST" action="/cert/{{ course_slug }}/verify">
+      <label for="name">Full name</label>
+      <input type="text" id="name" name="name" placeholder="e.g. Lluís Foreman" autocomplete="off" required>
+
+      <div class="checkbox-row">
+        <input type="checkbox" id="confirm" name="confirm" required
+               onchange="document.getElementById('submit-btn').disabled = !this.checked;">
+        <label for="confirm" class="checkbox-label">I hereby confirm that the above name is my legal identity and that I accept full legal responsibility for any unauthorised use of this document</label>
+      </div>
+
+      <button type="submit" id="submit-btn" disabled>Generate Certificate</button>
+    </form>
+    <p class="hint">Your name must match your community name exactly.</p>
+  </div>
+</body>
+</html>
