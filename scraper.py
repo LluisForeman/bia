@@ -10,7 +10,7 @@ def scrape_all_pages() -> set:
     names = set()
     page = 1
     while True:
-        url = BASE_URL if page == 1 else f"{BASE_URL}?p={page}"
+        url = f"{BASE_URL}?p={page}"
         try:
             r = requests.get(url, headers=HEADERS, timeout=10)
             match = NEXT_DATA_PATTERN.search(r.text)
