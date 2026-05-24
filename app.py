@@ -61,10 +61,22 @@ DOCUMENTS = {
     "satcom":                     ("written/satcom.pdf",                            "Satcom"),
     # New directories
     "100companies":               ("written/100aerospace.pdf",                      "Global Aircraft Manufacturers"),
-    "100aircraft":                ("written/100aerospace.pdf",                      "Global Aircraft Manufacturers"),
+    "100aircraft":                ("written/100aircraft.pdf",                       "Historic & Innovative Aircraft"),
     "100airlines":                ("written/100airlines.pdf",                       "Global Commercial Airlines"),
     "100airports":                ("written/100airports.pdf",                       "Global Terminals & Mega-Hubs"),
     "100components":              ("written/100components.pdf",                     "Aerospace Component Suppliers"),
+    # Career Transition Guides
+    "transition-automotive":      ("written/transition automotive engineers.pdf",   "From Automotive & Diesel Mechanics to Aerospace"),
+    "transition-chemical":        ("written/transition chemical engineering.pdf",   "From Chemical Engineering to Aerospace"),
+    "transition-computer-science":("written/transition computerscience engineering.pdf", "From Computer Science to Aerospace"),
+    "transition-electrical":      ("written/transition electrical engineering.pdf",   "From Electrical Engineering to Aerospace"),
+    "transition-electrical-technical":("written/transition electrical technical.pdf", "From Electrical Technician to Aerospace"),
+    "transition-hydraulics":      ("written/transition hydraulics pneumatics.pdf",   "From Hydraulics & Pneumatics Engineering to Aerospace"),
+    "transition-industrial":      ("written/transition industrial engineering.pdf",   "From Industrial Engineering to Aerospace"),
+    "transition-laboratory":      ("written/transition laboratory.pdf",               "From Laboratory Technician to Aerospace"),
+    "transition-materials-science":("written/transition materialsscience engineering.pdf", "From Materials Science to Aerospace"),
+    "transition-mechanical":      ("written/transition mechanical engineering.pdf",   "From Mechanical Engineering to Aerospace"),
+    "transition-textile":         ("written/transition textile engineering.pdf",      "From Textile Engineering to Aerospace"),
 }
 
 # --- Certificate registry ---
