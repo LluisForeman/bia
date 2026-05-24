@@ -59,6 +59,12 @@ DOCUMENTS = {
     "market-intelligence":        ("written/market intelligence.pdf",               "Market Intelligence"),
     "rocket-propulsion":          ("written/rocket propulsion engineering.pdf",     "Rocket Propulsion Engineering"),
     "satcom":                     ("written/satcom.pdf",                            "Satcom"),
+    # New directories
+    "100companies":               ("written/100aerospace.pdf",                      "Global Aircraft Manufacturers"),
+    "100aircraft":                ("written/100aerospace.pdf",                      "Global Aircraft Manufacturers"),
+    "100airlines":                ("written/100airlines.pdf",                       "Global Commercial Airlines"),
+    "100airports":                ("written/100airports.pdf",                       "Global Terminals & Mega-Hubs"),
+    "100components":              ("written/100components.pdf",                     "Aerospace Component Suppliers"),
 }
 
 # --- Certificate registry ---
