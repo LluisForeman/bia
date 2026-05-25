@@ -69,13 +69,17 @@ DOCUMENTS = {
     "transition-automotive":      ("written/transition automotive engineers.pdf",   "From Automotive & Diesel Mechanics to Aerospace"),
     "transition-chemical":        ("written/transition chemical engineering.pdf",   "From Chemical Engineering to Aerospace"),
     "transition-computer-science":("written/transition computerscience engineering.pdf", "From Computer Science to Aerospace"),
+    "transition-control-theory":  ("written/transition control theory.pdf",          "From Control Theory to Aerospace"),
     "transition-electrical":      ("written/transition electrical engineering.pdf",   "From Electrical Engineering to Aerospace"),
     "transition-electrical-technical":("written/transition electrical technical.pdf", "From Electrical Technician to Aerospace"),
     "transition-hydraulics":      ("written/transition hydraulics pneumatics.pdf",   "From Hydraulics & Pneumatics Engineering to Aerospace"),
     "transition-industrial":      ("written/transition industrial engineering.pdf",   "From Industrial Engineering to Aerospace"),
     "transition-laboratory":      ("written/transition laboratory.pdf",               "From Laboratory Technician to Aerospace"),
     "transition-materials-science":("written/transition materialsscience engineering.pdf", "From Materials Science to Aerospace"),
+    "transition-mathematics":     ("written/transition mathematics.pdf",             "From Mathematics to Aerospace"),
     "transition-mechanical":      ("written/transition mechanical engineering.pdf",   "From Mechanical Engineering to Aerospace"),
+    "transition-mechatronics":    ("written/transition mechatronics.pdf",            "From Mechatronics to Aerospace"),
+    "transition-physics":         ("written/transition physics.pdf",                 "From Physics to Aerospace"),
     "transition-textile":         ("written/transition textile engineering.pdf",      "From Textile Engineering to Aerospace"),
 }
 
