@@ -17,6 +17,7 @@ VALID_NAMES: set = set()
 MANUAL_NAMES: set = {
     "Sharon Yemima",
     "Imogen Neath",
+    "Lluís Foreman",
 }
 
 # --- Document registry ---
