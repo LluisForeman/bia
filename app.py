@@ -204,33 +204,11 @@ def cert_verify(course_slug):
     # Sign a token encoding all the data needed to regenerate the PDF
     token = _signer.dumps({"name": name, "course": course_slug, "cert_id": cert_id, "issued": issued})
 
-    return redirect(url_for("cert_view", course_slug=course_slug, token=token))
+    return redirect(url_for("cert_complete", course_slug=course_slug, token=token))
 
 
 @app.route("/cert/<course_slug>/view/<token>")
 def cert_view(course_slug, token):
-    if course_slug not in CERTIFICATES:
-        abort(404)
-    try:
-        data = _signer.loads(token)
-    except Exception:
-        abort(400)
-
-    name         = data["name"]
-    cert_id      = data["cert_id"]
-    issued       = data["issued"]
-    course_title = CERTIFICATES[course_slug]
-    cert_url     = url_for("cert_view", course_slug=course_slug, token=token, _external=True)
-    download_url = url_for("cert_download", course_slug=course_slug, token=token)
-
-    return render_template("cert_view.html",
-                           name=name, cert_id=cert_id, issued=issued,
-                           course_title=course_title, cert_url=cert_url,
-                           download_url=download_url)
-
-
-@app.route("/cert/<course_slug>/download/<token>")
-def cert_download(course_slug, token):
     if course_slug not in CERTIFICATES:
         abort(404)
     try:
@@ -250,6 +228,26 @@ def cert_download(course_slug, token):
         mimetype="application/pdf",
         headers={"Content-Disposition": f"inline; filename={filename}"}
     )
+
+
+@app.route("/cert/<course_slug>/complete/<token>")
+def cert_complete(course_slug, token):
+    if course_slug not in CERTIFICATES:
+        abort(404)
+    try:
+        data = _signer.loads(token)
+    except Exception:
+        abort(400)
+
+    name         = data["name"]
+    cert_id      = data["cert_id"]
+    issued       = data["issued"]
+    course_title = CERTIFICATES[course_slug]
+    cert_url     = url_for("cert_view", course_slug=course_slug, token=token, _external=True)
+
+    return render_template("cert_view.html",
+                           name=name, cert_id=cert_id, issued=issued,
+                           course_title=course_title, cert_url=cert_url)
 
 
 # ── Utility routes ────────────────────────────────────────────────────────────
