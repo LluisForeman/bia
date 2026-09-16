@@ -146,12 +146,6 @@
     <h1>Download your {{ title }} document</h1>
     <p>Enter your name exactly as it appears in the community — including capitalisation.</p>
 
-    {% if blocked %}
-    <div class="error">
-      This document must be accessed from inside the community. Please click the link from the Skool platform.
-    </div>
-    {% else %}
-
     {% if warming %}
     <div class="warming">
       <div class="spinner"></div>
@@ -181,7 +175,6 @@
     </div>
     {% endif %}
     <p class="hint">Your name must match your community name exactly.</p>
-    {% endif %}
   </div>
 </body>
 </html>

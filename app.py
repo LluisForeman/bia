@@ -1,13 +1,17 @@
-from flask import Flask, render_template, request, Response, abort, redirect, url_for, session
+from flask import Flask, render_template, request, Response, abort, redirect, url_for
+from apscheduler.schedulers.background import BackgroundScheduler
 from itsdangerous import URLSafeSerializer
+from scraper import scrape_all_pages
 from pdf_gen import generate_pdf, generate_certificate
-import hashlib, os
+import hashlib, os, atexit
 from datetime import datetime
 from zoneinfo import ZoneInfo
 
 app = Flask(__name__)
 app.secret_key = os.environ.get("SECRET_KEY", "bia-secret-key-change-in-prod")
 _signer = URLSafeSerializer(app.secret_key, salt="cert")
+
+VALID_NAMES: set = set()
 
 # --- Document registry ---
 # "url-slug": ("written/filename.pdf", "Display Title")
@@ -99,16 +103,24 @@ CERTIFICATES = {
     "rocket-fundamentals":   "Aerospace Engineering: Rocket Fundamentals",
 }
 
-def _came_from_skool():
-    ref = request.referrer or ""
-    return "skool.com" in ref
+def refresh_names():
+    global VALID_NAMES
+    VALID_NAMES = scrape_all_pages()
+
+# Load names synchronously — gunicorn binds the port before this runs
+refresh_names()
+
+scheduler = BackgroundScheduler()
+scheduler.add_job(refresh_names, "interval", hours=1)
+scheduler.start()
+atexit.register(lambda: scheduler.shutdown())
 
 
 # ── Interview doc routes ──────────────────────────────────────────────────────
 
 @app.route("/")
 def index():
-    return render_template("index.html", blocked=False, error=None, warming=False,
+    return render_template("index.html", error=None, warming=False,
                            slug=None, title="your")
 
 
@@ -116,23 +128,26 @@ def index():
 def doc_page(slug):
     if slug not in DOCUMENTS:
         abort(404)
-    if _came_from_skool():
-        session['skool_ok'] = True
     _, title = DOCUMENTS[slug]
-    if not session.get('skool_ok'):
-        return render_template("index.html", blocked=True, error=None, warming=False, slug=slug, title=title)
-    return render_template("index.html", blocked=False, error=None, warming=False, slug=slug, title=title)
+    return render_template("index.html", error=None, warming=False, slug=slug, title=title)
 
 
 @app.route("/<slug>/verify", methods=["POST"])
 def verify(slug):
     if slug not in DOCUMENTS:
         abort(404)
-    if not session.get('skool_ok'):
-        abort(403)
 
     pdf_path, title = DOCUMENTS[slug]
     name = request.form.get("name", "").strip()
+    print(f"[verify] slug={slug} submitted='{name}' loaded={len(VALID_NAMES)}")
+
+    if not VALID_NAMES:
+        return render_template("index.html", warming=True, error=None, slug=slug, title=title)
+
+    if name not in VALID_NAMES:
+        return render_template("index.html",
+                               error="Name not recognised. Check spelling and capitalisation exactly as it appears in the community.",
+                               warming=False, slug=slug, title=title)
 
     pdf_bytes = generate_pdf(name, pdf_path)
     filename = f"{slug}_{name.replace(' ', '_')}.pdf"
@@ -149,13 +164,8 @@ def verify(slug):
 def cert_page(course_slug):
     if course_slug not in CERTIFICATES:
         abort(404)
-    if _came_from_skool():
-        session['skool_ok'] = True
     course_title = CERTIFICATES[course_slug]
-    if not session.get('skool_ok'):
-        return render_template("cert.html", blocked=True, error=None, warming=False,
-                               course_slug=course_slug, course_title=course_title)
-    return render_template("cert.html", blocked=False, error=None, warming=False,
+    return render_template("cert.html", error=None, warming=False,
                            course_slug=course_slug, course_title=course_title)
 
 
@@ -163,11 +173,19 @@ def cert_page(course_slug):
 def cert_verify(course_slug):
     if course_slug not in CERTIFICATES:
         abort(404)
-    if not session.get('skool_ok'):
-        abort(403)
 
     course_title = CERTIFICATES[course_slug]
     name = request.form.get("name", "").strip()
+    print(f"[cert] course={course_slug} submitted='{name}' loaded={len(VALID_NAMES)}")
+
+    if not VALID_NAMES:
+        return render_template("cert.html", warming=True, error=None,
+                               course_slug=course_slug, course_title=course_title)
+
+    if name not in VALID_NAMES:
+        return render_template("cert.html",
+                               error="Name not recognised. Check spelling and capitalisation exactly as it appears in the community.",
+                               warming=False, course_slug=course_slug, course_title=course_title)
 
     # Generate deterministic cert ID from name + course
     raw = f"{app.secret_key}:{name}:{course_slug}"
@@ -214,7 +232,8 @@ def health():
 
 @app.route("/debug")
 def debug():
-    return {"skool_ok": session.get('skool_ok', False)}, 200
+    sample = sorted(list(VALID_NAMES))[:10]
+    return {"count": len(VALID_NAMES), "sample": sample}, 200
 
 
 if __name__ == "__main__":
