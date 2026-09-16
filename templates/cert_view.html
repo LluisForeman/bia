@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ValueKnow — Your Certificate</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #f4f6f9;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .card {
+      background: white;
+      border-radius: 16px;
+      padding: 40px;
+      max-width: 500px;
+      width: 100%;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+    }
+    .logo {
+      font-size: 13px;
+      font-weight: 600;
+      color: #b8860b;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+    .course-badge {
+      display: inline-block;
+      background: #fdf3d0;
+      color: #7a5a00;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 20px;
+      margin-bottom: 20px;
+    }
+    h1 {
+      font-size: 22px;
+      font-weight: 600;
+      color: #1a1a2e;
+      margin-bottom: 6px;
+    }
+    .meta {
+      font-size: 13px;
+      color: #888;
+      margin-bottom: 28px;
+    }
+    .meta span {
+      color: #555;
+      font-weight: 500;
+    }
+    .section-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: #aaa;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 8px;
+    }
+    .url-box {
+      display: flex;
+      align-items: center;
+      border: 1.5px solid #dde1ea;
+      border-radius: 8px;
+      overflow: hidden;
+      margin-bottom: 24px;
+    }
+    .url-box input {
+      flex: 1;
+      border: none;
+      padding: 11px 14px;
+      font-size: 12px;
+      color: #444;
+      background: #fafafa;
+      outline: none;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .copy-btn {
+      padding: 11px 16px;
+      background: #f0f0f0;
+      border: none;
+      border-left: 1.5px solid #dde1ea;
+      font-size: 12px;
+      font-weight: 600;
+      color: #444;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background 0.15s;
+    }
+    .copy-btn:hover { background: #e4e4e4; }
+    .copy-btn.copied { color: #2e7d32; background: #e8f5e9; }
+    .view-btn {
+      display: block;
+      width: 100%;
+      padding: 13px;
+      background: #b8860b;
+      color: white;
+      font-size: 15px;
+      font-weight: 600;
+      font-family: inherit;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      text-align: center;
+      text-decoration: none;
+      transition: background 0.15s;
+    }
+    .view-btn:hover { background: #9a7009; }
+    .hint {
+      font-size: 12px;
+      color: #aaa;
+      text-align: center;
+      margin-top: 16px;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="logo">ValueKnow</div>
+    <span class="course-badge">{{ course_title }}</span>
+    <h1>Your certificate is ready</h1>
+    <p class="meta">Issued to <span>{{ name }}</span> &nbsp;·&nbsp; {{ issued }} &nbsp;·&nbsp; <span>{{ cert_id }}</span></p>
+
+    <div class="section-label">Permanent link</div>
+    <div class="url-box">
+      <input type="text" id="cert-url" value="{{ cert_url }}" readonly>
+      <button class="copy-btn" id="copy-btn" onclick="copyUrl()">Copy</button>
+    </div>
+
+    <a class="view-btn" href="{{ download_url }}" target="_blank">View Certificate</a>
+    <p class="hint">Save the link above to access or share your certificate anytime.</p>
+  </div>
+
+  <script>
+    function copyUrl() {
+      navigator.clipboard.writeText(document.getElementById('cert-url').value).then(function() {
+        var btn = document.getElementById('copy-btn');
+        btn.textContent = 'Copied!';
+        btn.classList.add('copied');
+        setTimeout(function() {
+          btn.textContent = 'Copy';
+          btn.classList.remove('copied');
+        }, 2000);
+      });
+    }
+  </script>
+</body>
+</html>

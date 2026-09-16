@@ -216,9 +216,31 @@ def cert_view(course_slug, token):
     except Exception:
         abort(400)
 
-    name        = data["name"]
-    cert_id     = data["cert_id"]
-    issued      = data["issued"]
+    name         = data["name"]
+    cert_id      = data["cert_id"]
+    issued       = data["issued"]
+    course_title = CERTIFICATES[course_slug]
+    cert_url     = url_for("cert_view", course_slug=course_slug, token=token, _external=True)
+    download_url = url_for("cert_download", course_slug=course_slug, token=token)
+
+    return render_template("cert_view.html",
+                           name=name, cert_id=cert_id, issued=issued,
+                           course_title=course_title, cert_url=cert_url,
+                           download_url=download_url)
+
+
+@app.route("/cert/<course_slug>/download/<token>")
+def cert_download(course_slug, token):
+    if course_slug not in CERTIFICATES:
+        abort(404)
+    try:
+        data = _signer.loads(token)
+    except Exception:
+        abort(400)
+
+    name         = data["name"]
+    cert_id      = data["cert_id"]
+    issued       = data["issued"]
     course_title = CERTIFICATES[course_slug]
 
     pdf_bytes = generate_certificate(name, course_title, cert_id, issued)
