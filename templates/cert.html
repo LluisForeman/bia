@@ -157,6 +157,12 @@
     <h1>Get your Certificate</h1>
     <p>Enter your name exactly as it appears in the community — including capitalisation. Your certificate will open as a shareable link.</p>
 
+    {% if blocked %}
+    <div class="error">
+      This certificate must be accessed from inside the community. Please click the link from the Skool platform.
+    </div>
+    {% else %}
+
     {% if warming %}
     <div class="warming">
       <div class="spinner"></div>
@@ -181,6 +187,7 @@
       <button type="submit" id="submit-btn" disabled>Generate Certificate</button>
     </form>
     <p class="hint">Your name must match your community name exactly.</p>
+    {% endif %}
   </div>
 </body>
 </html>
