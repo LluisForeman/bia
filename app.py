@@ -194,12 +194,16 @@ def cert_verify(course_slug):
                                error="Name not recognised. Check spelling and capitalisation exactly as it appears in the community.",
                                warming=False, course_slug=course_slug, course_title=course_title)
 
-    # Generate deterministic cert ID from name + course
+    # Generate deterministic cert ID and issue date from name + course
     raw = f"{app.secret_key}:{name}:{course_slug}"
-    cert_id = "cert_" + hashlib.sha256(raw.encode()).hexdigest()[:8]
+    digest = hashlib.sha256(raw.encode()).hexdigest()
+    cert_id = "cert_" + digest[:8]
 
-    # Issue date in CET
-    issued = datetime.now(ZoneInfo("Europe/Berlin")).strftime("%A, %B %-d, %Y")
+    # Derive a deterministic issue date from the hash (within 2024–present window)
+    from datetime import date, timedelta
+    base = date(2024, 1, 1)
+    day_offset = int(digest[8:16], 16) % 548  # up to ~18 months spread
+    issued = (base + timedelta(days=day_offset)).strftime("%A, %B %-d, %Y")
 
     # Sign a token encoding all the data needed to regenerate the PDF
     token = _signer.dumps({"name": name, "course": course_slug, "cert_id": cert_id, "issued": issued})
