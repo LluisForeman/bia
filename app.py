@@ -13,6 +13,12 @@ _signer = URLSafeSerializer(app.secret_key, salt="cert")
 
 VALID_NAMES: set = set()
 
+# Manually approved names (not in Skool community scrape)
+MANUAL_NAMES: set = {
+    "Sharon Yemima",
+    "Imogen Neath",
+}
+
 # --- Document registry ---
 # "url-slug": ("written/filename.pdf", "Display Title")
 DOCUMENTS = {
@@ -105,7 +111,7 @@ CERTIFICATES = {
 
 def refresh_names():
     global VALID_NAMES
-    VALID_NAMES = scrape_all_pages()
+    VALID_NAMES = scrape_all_pages() | MANUAL_NAMES
 
 # Load names synchronously — gunicorn binds the port before this runs
 refresh_names()
